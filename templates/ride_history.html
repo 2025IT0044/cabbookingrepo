@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideGo | Ride History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="history-page">
+
+<nav class="ride-navbar">
+    <div class="ride-logo">
+        🚕 <strong>RideGo</strong>
+    </div>
+
+    <div class="ride-nav-links">
+        <a href="/">Home</a>
+        <a href="/book">Book a Ride</a>
+        <a href="#profile">Profile</a>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+</nav>
+
+<main class="history-container">
+    <header class="history-heading">
+        <span class="history-label">RIDEGO</span>
+        <h1>My Rides</h1>
+        <p>Your previous bookings and payment status.</p>
+    </header>
+
+    <section class="history-list" aria-label="User ride history">
+        {% if rides %}
+            {% for ride in rides %}
+            <article class="history-card">
+                <div class="history-card-header">
+                    <div>
+                        <span class="history-card-label">BOOKING</span>
+                        <h2>#RG{{ ride["id"] }}</h2>
+                    </div>
+                    <span class="history-status {{ ride['status']|lower|replace(' ', '-') }}">
+                        {{ ride["status"] }}
+                    </span>
+                </div>
+
+                <div class="history-route">
+                    <strong>{{ ride["pickup"] }}</strong>
+                    <span>→</span>
+                    <strong>{{ ride["destination"] }}</strong>
+                </div>
+
+                <div class="history-details">
+                    <div>
+                        <span>Cab type</span>
+                        <strong>{{ ride["cab_type"] }}</strong>
+                    </div>
+                    <div>
+                        <span>Fare</span>
+                        <strong>₹{{ ride["fare"] }}</strong>
+                    </div>
+                    <div>
+                        <span>Booking date</span>
+                        <strong>{{ ride["booking_time"] }}</strong>
+                    </div>
+                    <div>
+                        <span>Payment</span>
+                        <strong class="payment-{{ ride['payment_status']|lower }}">
+                            {{ ride["payment_status"] }}
+                        </strong>
+                    </div>
+                </div>
+
+                {% if ride["status"] == "Completed" and ride["payment_status"] == "Paid" %}
+                    {% if ride["rating_id"] %}
+                    <div class="rating-complete">
+                        <div class="rating-complete-stars" aria-label="{{ ride['rating'] }} out of 5 stars">
+                            {{ "⭐" * ride["rating"] }}
+                        </div>
+                        <strong>Ride Rated</strong>
+                        <p>Your review has been submitted.</p>
+                        {% if ride["review"] %}
+                        <blockquote>“{{ ride["review"] }}”</blockquote>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <details class="rating-panel">
+                        <summary>⭐ Rate Your Ride</summary>
+                        <form method="POST" action="{{ url_for('rate_ride', booking_id=ride['id']) }}">
+                            <fieldset class="star-rating">
+                                <legend>How was your ride?</legend>
+                                {% for star in range(5, 0, -1) %}
+                                <input type="radio" id="rating-{{ ride['id'] }}-{{ star }}" name="rating" value="{{ star }}" required>
+                                <label for="rating-{{ ride['id'] }}-{{ star }}" title="{{ star }} out of 5 stars">★</label>
+                                {% endfor %}
+                            </fieldset>
+                            <label class="review-label" for="review-{{ ride['id'] }}">Write a Review</label>
+                            <textarea id="review-{{ ride['id'] }}" name="review" rows="3" placeholder="Tell us about your ride..."></textarea>
+                            <button type="submit" class="rating-submit">Submit Review</button>
+                        </form>
+                    </details>
+                    {% endif %}
+                {% endif %}
+            </article>
+            {% endfor %}
+        {% else %}
+            <div class="history-empty">
+                <h2>No rides yet</h2>
+                <p>Your completed and current bookings will appear here.</p>
+                <a href="/book" class="history-button">Book a Ride</a>
+            </div>
+        {% endif %}
+    </section>
+</main>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

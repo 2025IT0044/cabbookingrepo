@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RideGo | Payment</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="payment-page">
+
+<nav class="ride-navbar">
+
+    <div class="ride-logo">
+        🚕 <strong>RideGo</strong>
+    </div>
+
+    <div class="ride-nav-links">
+        <a href="/book">Book Ride</a>
+        <a href="/ride-history">Ride History</a>
+        <a href="#profile">Profile</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+</nav>
+
+
+<main class="payment-container">
+
+    <div class="payment-header">
+
+        <span>RIDE COMPLETED</span>
+
+        <h1>Complete your payment</h1>
+
+        <p>
+            Your ride has been completed successfully.
+        </p>
+
+    </div>
+
+
+    <div class="payment-layout">
+
+
+        <!-- PAYMENT FORM -->
+
+        <div class="payment-card">
+
+            <h2>Choose payment method</h2>
+
+            <form method="POST"
+                action="{{ url_for('payment', booking_id=booking['id']) }}">
+
+                <label class="payment-option">
+
+                    <input type="radio"
+                           name="payment_method"
+                           value="UPI"
+                           required>
+
+                    <div>
+                        <strong>UPI</strong>
+                        <span>Google Pay, PhonePe, Paytm</span>
+                    </div>
+
+                </label>
+
+
+                <label class="payment-option">
+
+                    <input type="radio"
+                           name="payment_method"
+                           value="Cash">
+
+                    <div>
+                        <strong>Cash</strong>
+                        <span>Pay directly to the driver</span>
+                    </div>
+
+                </label>
+
+
+                <label class="payment-option">
+
+                    <input type="radio"
+                           name="payment_method"
+                           value="Card">
+
+                    <div>
+                        <strong>Card</strong>
+                        <span>Debit or credit card</span>
+                    </div>
+
+                </label>
+
+
+                <button type="submit"
+                        class="payment-button">
+
+                    Pay Now
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+
+        <div class="payment-summary">
+
+            <span>TRIP SUMMARY</span>
+
+            <h2>₹{{ booking["fare"] }}</h2>
+
+            <div class="payment-line">
+
+                <span>Booking ID</span>
+
+                <strong>
+                    #RG{{ booking["id"] }}
+                </strong>
+
+            </div>
+
+
+            <div class="payment-line">
+
+                <span>Cab</span>
+
+                <strong>
+                    {{ booking["cab_type"] }}
+                </strong>
+
+            </div>
+
+
+            <div class="payment-line">
+
+                <span>Pickup</span>
+
+                <strong>
+                    {{ booking["pickup"] }}
+                </strong>
+
+            </div>
+
+
+            <div class="payment-line">
+
+                <span>Destination</span>
+
+                <strong>
+                    {{ booking["destination"] }}
+                </strong>
+
+            </div>
+
+
+            <div class="secure-payment">
+
+                🛡️ Secure payment
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer class="ride-footer">
+
+    <strong>🚕 RideGo</strong>
+
+    <span>Safe rides. Simple journeys.</span>
+
+</footer>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

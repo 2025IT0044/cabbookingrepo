@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Book a Ride - RideGo</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+
+        <div class="logo">
+            🚕 RideGo
+        </div>
+
+        <div class="nav-links">
+            <a href="/book">Book a Ride</a>
+            <a href="/ride-history">Ride History</a>
+            <a href="/">Home</a>
+            <a href="#profile">Profile</a>
+            <a href="/logout" class="login-btn">Logout</a>
+        </div>
+
+    </nav>
+
+
+    {% if request.args.get("payment_error") == "already_paid" %}
+        <div class="payment-success-message">
+            This ride has already been paid.
+        </div>
+    {% endif %}
+
+    {% if active_booking %}
+
+    <main class="active-ride-page" data-booking-id="{{ active_booking['id'] }}">
+        <section class="active-ride-header">
+            {% if active_booking["status"] == "Searching" %}
+                <span class="active-status-icon">🔍</span>
+                <span class="card-label">ACTIVE RIDE</span>
+                <h1>Finding your driver...</h1>
+                <p>We're looking for an available driver near you.</p>
+            {% elif active_booking["status"] == "Accepted" %}
+                <span class="active-status-icon">🚕</span>
+                <span class="card-label">DRIVER FOUND</span>
+                <h1>Your driver is on the way</h1>
+                <p>Your driver has accepted the ride and is coming to pick you up.</p>
+            {% elif active_booking["status"] == "Ride Started" %}
+                <span class="active-status-icon">🚗</span>
+                <span class="card-label">RIDE IN PROGRESS</span>
+                <h1>Your ride has started</h1>
+                <p>You are currently on your way to your destination.</p>
+            {% elif active_booking["status"] == "Completed" and payment_success %}
+                <span class="active-status-icon">✓</span>
+                <span class="card-label">PAYMENT SUCCESSFUL</span>
+                <h1>Payment Successful</h1>
+                <p>Your ride is paid. You can rate your ride or book another journey.</p>
+            {% else %}
+                <span class="active-status-icon">✓</span>
+                <span class="card-label">RIDE COMPLETED</span>
+                <h1>You reached your destination</h1>
+                <p>Your ride has been completed successfully.</p>
+            {% endif %}
+        </section>
+
+        <section class="active-ride-layout">
+            <article class="active-ride-card">
+                <div class="active-card-heading">
+                    <div>
+                        <span class="card-label">BOOKING #RG{{ active_booking["id"] }}</span>
+                        <h2>Ride details</h2>
+                    </div>
+                    <span class="history-status {{ active_booking['status']|lower|replace(' ', '-') }}">{{ active_booking["status"] }}</span>
+                </div>
+
+                <div class="active-route">
+                    <div><span>●</span><small>PICKUP</small><strong>{{ active_booking["pickup"] }}</strong></div>
+                    <div class="active-route-line"></div>
+                    <div><span>●</span><small>DESTINATION</small><strong>{{ active_booking["destination"] }}</strong></div>
+                </div>
+
+                <div class="active-ride-details">
+                    <div><span>Driver</span><strong>{{ active_booking["driver_name"] or "Finding a driver" }}</strong></div>
+                    {% if active_booking["phone"] %}<div><span>Phone</span><strong>{{ active_booking["phone"] }}</strong></div>{% endif %}
+                    <div><span>Cab</span><strong>{{ active_booking["cab_type"] }}{% if active_booking["car_number"] %} · {{ active_booking["car_number"] }}{% endif %}</strong></div>
+                    <div><span>Fare</span><strong>₹{{ active_booking["fare"] }}</strong></div>
+                </div>
+
+                {% if active_booking["status"] in ["Searching", "Accepted"] %}
+                <details class="cancel-ride-panel">
+                    <summary>Cancel Ride</summary>
+                    <div class="cancel-ride-confirmation">
+                        <p>Are you sure you want to cancel this ride?</p>
+                        <form method="POST" action="{{ url_for('cancel_ride', booking_id=active_booking['id']) }}">
+                            <button type="submit" class="cancel-confirm-button">Cancel Ride</button>
+                            <button type="button" class="keep-ride-button" onclick="this.closest('details').open = false">Keep Ride</button>
+                        </form>
+                    </div>
+                </details>
+                {% endif %}
+            </article>
+
+            {% if active_booking["status"] == "Completed" and active_booking["payment_status"] != "Paid" %}
+            <article class="inline-payment-card">
+                <span class="card-label">RIDE COMPLETED</span>
+                <h2>Complete Payment</h2>
+                <p>Choose a payment method to finish your ride.</p>
+                <form method="POST" action="{{ url_for('payment', booking_id=active_booking['id']) }}">
+                    <div class="inline-payment-options">
+                        <label><input type="radio" name="payment_method" value="UPI" required><span>UPI</span></label>
+                        <label><input type="radio" name="payment_method" value="Card"><span>Card</span></label>
+                        <label><input type="radio" name="payment_method" value="Cash"><span>Cash</span></label>
+                    </div>
+                    <button type="submit" class="find-ride-btn">Pay Now <span>→</span></button>
+                </form>
+            </article>
+            {% elif active_booking["status"] == "Completed" and active_booking["payment_status"] == "Paid" %}
+            <article class="inline-payment-card payment-done-card">
+                <span class="card-label">PAYMENT</span>
+                <h2>Payment Successful</h2>
+                {% if active_booking["rating_id"] %}
+                    <div class="rating-complete-stars">{{ "⭐" * active_booking["rating"] }}</div>
+                    <p>Your ride has been rated.</p>
+                {% else %}
+                    <h3>Rate Your Ride</h3>
+                    <a href="/ride-history" class="history-button">Rate Your Ride</a>
+                {% endif %}
+                <a href="{{ url_for('book_ride', reset=1) }}" class="outline-btn">Book Another Ride</a>
+            </article>
+            {% endif %}
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        const activeRide = document.querySelector("[data-booking-id]");
+        if (activeRide) {
+            const bookingId = activeRide.dataset.bookingId;
+            const tabId = sessionStorage.getItem("ridego_tab_id");
+            setInterval(async () => {
+                const response = await fetch(`/book/status/${bookingId}?tab_id=${encodeURIComponent(tabId)}`, {cache: "no-store"});
+                if (!response.ok) return;
+                const data = await response.json();
+                const currentStatus = document.querySelector(".history-status")?.textContent.trim();
+                if (data.status !== currentStatus) window.location.reload();
+            }, 2500);
+        }
+    </script>
+
+    {% else %}
+
+    <section class="ride-booking-page">
+
+        <!-- LEFT SIDE -->
+
+        <div class="booking-intro">
+
+            <p class="small-heading">
+                RIDEGO BOOKING
+            </p>
+
+            <h1>
+                Where are you<br>
+                going today? 🚕
+            </h1>
+
+            <p class="intro-text">
+                Enter your trip details, choose your preferred
+                cab and get an estimated fare instantly.
+            </p>
+
+            <div class="booking-features">
+
+                <div class="feature-item">
+                    <span>📍</span>
+                    <div>
+                        <strong>Easy Pickup</strong>
+                        <p>Choose your pickup location</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span>🚗</span>
+                    <div>
+                        <strong>Choose Your Ride</strong>
+                        <p>Select the cab that suits you</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span>💰</span>
+                    <div>
+                        <strong>Affordable Fare</strong>
+                        <p>Know your estimated fare</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT SIDE BOOKING CARD -->
+
+        <div class="booking-form-card">
+
+            <div class="card-top">
+
+                <div>
+                    <p class="card-label">BOOK A RIDE</p>
+                    <h2>Plan your trip</h2>
+                </div>
+
+                <div class="mini-car">
+                    🚕
+                </div>
+
+            </div>
+
+
+            <form method="POST">
+
+                <!-- PICKUP -->
+
+                <div class="location-box">
+
+                    <div class="location-icon pickup">
+                        ●
+                    </div>
+
+                    <div class="input-area">
+
+                        <label>Pickup Location</label>
+
+                        <input
+                            type="text"
+                            name="pickup"
+                            placeholder="Where should we pick you up?"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="route-line"></div>
+
+
+                <!-- DESTINATION -->
+
+                <div class="location-box">
+
+                    <div class="location-icon destination">
+                        ●
+                    </div>
+
+                    <div class="input-area">
+
+                        <label>Destination</label>
+
+                        <input
+                            type="text"
+                            name="destination"
+                            placeholder="Where are you going?"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- CAB TYPE -->
+
+                <div class="cab-section">
+
+                    <label class="cab-title">
+                        Choose your ride
+                    </label>
+
+                    <div class="cab-options">
+
+                        <label class="cab-option">
+
+                            <input
+                                type="radio"
+                                name="cab_type"
+                                value="Auto"
+                                required
+                            >
+
+                            <div class="cab-content">
+                                <span class="cab-emoji">🛺</span>
+
+                                <strong>Auto</strong>
+
+                                <small>Budget · ₹100</small>
+                            </div>
+
+                        </label>
+
+
+                        <label class="cab-option">
+
+                            <input
+                                type="radio"
+                                name="cab_type"
+                                value="Mini"
+                            >
+
+                            <div class="cab-content">
+                                <span class="cab-emoji">🚕</span>
+
+                                <strong>Mini</strong>
+
+                                <small>Comfort · ₹150</small>
+                            </div>
+
+                        </label>
+
+
+                        <label class="cab-option">
+
+                            <input
+                                type="radio"
+                                name="cab_type"
+                                value="Sedan"
+                            >
+
+                            <div class="cab-content">
+                                <span class="cab-emoji">🚗</span>
+
+                                <strong>Sedan</strong>
+
+                                <small>Premium · ₹200</small>
+                            </div>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SUBMIT -->
+
+                <button type="submit" class="find-ride-btn">
+                    Find a Ride
+                    <span>→</span>
+                </button>
+
+            </form>
+
+
+            <p class="secure-text">
+                🔒 Your booking information is securely stored.
+            </p>
+
+        </div>
+
+    </section>
+
+    {% endif %}
+
+
+</body>
+</html>

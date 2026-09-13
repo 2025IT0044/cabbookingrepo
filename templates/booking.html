@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RideGo | Ride Confirmed</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="ride-page">
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="ride-navbar">
+
+    <div class="ride-logo">
+        <span>🚕</span>
+        <strong>RideGo</strong>
+    </div>
+
+    <div class="ride-nav-links">
+        <a href="/">Home</a>
+        <a href="/book">Book a Ride</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+        <a href="/logout" class="ride-logout">Logout</a>
+    </div>
+
+</nav>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="ride-container">
+
+
+    <!-- ================= HEADER ================= -->
+
+    <section class="confirmation-header">
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <div>
+            {% if driver %}
+
+                <p class="small-label">BOOKING CONFIRMED</p>
+
+                <h1>Your ride is confirmed</h1>
+
+                <p>
+                    Your driver has been assigned and is ready for your trip.
+                </p>
+
+            {% else %}
+
+                <p class="small-label">BOOKING CREATED</p>
+
+                <h1>Finding your driver</h1>
+
+                <p>
+                    We're looking for an available driver near your pickup location.
+                </p>
+
+            {% endif %}
+        </div>
+
+        <div class="fare-header">
+            <span>ESTIMATED FARE</span>
+            <strong>₹{{ fare }}</strong>
+        </div>
+
+    </section>
+
+
+    <!-- ================= MAIN GRID ================= -->
+
+    <section class="ride-grid">
+
+
+        <!-- ================= LEFT SIDE ================= -->
+
+        <div class="ride-left">
+
+
+            <!-- MAP -->
+
+            <div class="map-card">
+
+                <div class="map-top">
+
+                    <div>
+                        <span class="map-title">Your ride route</span>
+                        <span class="map-subtitle">
+                            {{ pickup }} → {{ destination }}
+                        </span>
+                    </div>
+
+                    <span class="live-badge">
+                        ● LIVE
+                    </span>
+
+                </div>
+
+
+                <div class="fake-map">
+
+                    <div class="road road-one"></div>
+                    <div class="road road-two"></div>
+                    <div class="road road-three"></div>
+
+                    <!-- Pickup -->
+
+                    <div class="map-location pickup-location">
+
+                        <div class="location-pin pickup-pin">
+                            ●
+                        </div>
+
+                        <div class="location-label">
+                            <span>Pickup</span>
+                            <strong>{{ pickup }}</strong>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Destination -->
+
+                    <div class="map-location destination-location">
+
+                        <div class="location-pin destination-pin">
+                            ●
+                        </div>
+
+                        <div class="location-label">
+                            <span>Destination</span>
+                            <strong>{{ destination }}</strong>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Car -->
+
+                    {% if driver %}
+
+                    <div class="map-car">
+                        🚕
+                    </div>
+
+                    {% else %}
+
+                    <div class="map-search">
+                        🔎
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- LOCATIONS -->
+
+            <div class="locations-card">
+
+                <div class="location-row">
+
+                    <div class="location-dot green-dot"></div>
+
+                    <div>
+                        <span>Pickup location</span>
+                        <strong>{{ pickup }}</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="location-line"></div>
+
+
+                <div class="location-row">
+
+                    <div class="location-dot red-dot"></div>
+
+                    <div>
+                        <span>Destination</span>
+                        <strong>{{ destination }}</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- TRIP DETAILS -->
+
+            <div class="trip-details-card">
+
+                <h2>Trip details</h2>
+
+                <div class="details-grid">
+
+                    <div class="detail-item">
+                        <span>Booking ID</span>
+                        <strong>#RG{{ booking_id }}</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>Cab type</span>
+
+                        <strong>
+                            {% if cab_type == "Auto" %}
+                                🛺 Auto
+                            {% elif cab_type == "Mini" %}
+                                🚗 Mini
+                            {% else %}
+                                🚘 Sedan
+                            {% endif %}
+                        </strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>Estimated fare</span>
+                        <strong>₹{{ fare }}</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>Ride status</span>
+
+                        <strong class="status-text">
+                            {{ status }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= RIGHT SIDE ================= -->
+
+        <aside class="ride-right">
+
+
+            <!-- DRIVER CARD -->
+
+            {% if driver %}
+
+            <div class="driver-card">
+
+                <div class="driver-card-header">
+
+                    <div>
+                        <span class="card-label">YOUR DRIVER</span>
+                        <h2>Driver assigned</h2>
+                    </div>
+
+                    <div class="verified-badge">
+                        ✓ Verified
+                    </div>
+
+                </div>
+
+
+                <div class="driver-profile">
+
+                    <div class="driver-avatar">
+                        👨🏻
+                    </div>
+
+                    <div class="driver-info">
+
+                        <h3>{{ driver["name"] }}</h3>
+
+                        <div class="driver-rating">
+                            ★ 4.8
+                            <span>Experienced driver</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="vehicle-card">
+
+                    <div class="vehicle-icon">
+                        {% if cab_type == "Auto" %}
+                            🛺
+                        {% elif cab_type == "Mini" %}
+                            🚗
+                        {% else %}
+                            🚘
+                        {% endif %}
+                    </div>
+
+                    <div class="vehicle-info">
+
+                        <span>{{ cab_type }}</span>
+
+                        <strong>
+                            {{ driver["car_number"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="driver-details">
+
+                    <div>
+                        <span>Phone</span>
+                        <strong>{{ driver["phone"] }}</strong>
+                    </div>
+
+                    <div>
+                        <span>License</span>
+                        <strong>{{ driver["license_no"] }}</strong>
+                    </div>
+
+                </div>
+
+
+                <button class="contact-driver">
+                    ☎ Contact Driver
+                </button>
+
+            </div>
+
+
+            <!-- ARRIVAL STATUS -->
+
+            <div class="arrival-card">
+
+                <div class="arrival-icon">
+                    🚕
+                </div>
+
+                <div>
+
+                    <strong>Your driver is on the way</strong>
+
+                    <p>
+                        Please be ready at your pickup location.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% else %}
+
+
+            <!-- SEARCHING CARD -->
+
+            <div class="searching-card">
+
+                <div class="search-animation">
+                    🔎
+                </div>
+
+                <span class="card-label">RIDE STATUS</span>
+
+                <h2>Finding your driver...</h2>
+
+                <p>
+                    We're searching for an available
+                    {{ cab_type }} near your pickup location.
+                </p>
+
+
+                <div class="loading-bar">
+                    <div></div>
+                </div>
+
+
+                <small>
+                    This usually takes only a few seconds.
+                </small>
+
+            </div>
+
+
+            {% endif %}
+
+
+            <!-- SAFETY CARD -->
+
+            <div class="safety-card">
+
+                <div class="safety-icon">
+                    🛡️
+                </div>
+
+                <div>
+                    <strong>RideGo Safety</strong>
+
+                    <p>
+                        Your ride information is protected
+                        and your driver is verified.
+                    </p>
+                </div>
+
+            </div>
+
+
+        </aside>
+
+    </section>
+
+
+    <!-- ================= FOOTER ACTION ================= -->
+
+    <section class="bottom-action">
+
+        <a href="/dashboard" class="dashboard-button">
+            ← Back to Dashboard
+        </a>
+
+        <div class="help-text">
+            Need help with your ride?
+            <strong>Contact RideGo Support</strong>
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="ride-footer">
+
+    <strong>🚕 RideGo</strong>
+
+    <span>
+        Safe rides. Simple journeys.
+    </span>
+
+</footer>
+
+</body>
+</html>

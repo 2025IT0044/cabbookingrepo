@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideGo | Driver Ride History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="history-page driver-history-page">
+
+<nav class="driver-navbar">
+    <div class="driver-logo">
+        🚕 <strong>RideGo</strong>
+    </div>
+
+    <div class="driver-nav">
+        <a href="/driver/dashboard">Dashboard</a>
+        <a href="/driver/rides">My Rides</a>
+        <a href="/driver/dashboard#profile">Profile</a>
+        <a href="/logout">Logout</a>
+    </div>
+</nav>
+
+<main class="history-container">
+    <header class="history-heading">
+        <span class="history-label">DRIVER PORTAL</span>
+        <h1>My Rides</h1>
+        <p>Your completed trips and payment records.</p>
+    </header>
+
+    <section class="history-stats" aria-label="Driver earnings summary">
+        <div class="history-stat-card">
+            <span>Total Completed Rides</span>
+            <strong>{{ total_completed_rides }}</strong>
+        </div>
+        <div class="history-stat-card">
+            <span>Total Earnings</span>
+            <strong>₹{{ total_earnings }}</strong>
+        </div>
+    </section>
+
+    <section class="history-list" aria-label="Driver ride history">
+        {% if rides %}
+            {% for ride in rides %}
+            <article class="history-card">
+                <div class="history-card-header">
+                    <div>
+                        <span class="history-card-label">BOOKING</span>
+                        <h2>#RG{{ ride["id"] }}</h2>
+                    </div>
+                    <span class="history-status completed">Completed</span>
+                </div>
+
+                <div class="history-route">
+                    <strong>{{ ride["pickup"] }}</strong>
+                    <span>→</span>
+                    <strong>{{ ride["destination"] }}</strong>
+                </div>
+
+                <div class="history-details">
+                    <div>
+                        <span>Cab type</span>
+                        <strong>{{ ride["cab_type"] }}</strong>
+                    </div>
+                    <div>
+                        <span>Fare</span>
+                        <strong>₹{{ ride["fare"] }}</strong>
+                    </div>
+                    <div>
+                        <span>Payment</span>
+                        <strong class="payment-{{ ride['payment_status']|lower }}">
+                            {{ ride["payment_status"] }}
+                        </strong>
+                    </div>
+                    <div>
+                        <span>Date/time</span>
+                        <strong>{{ ride["booking_time"] }}</strong>
+                    </div>
+                </div>
+
+                {% if ride["rating"] %}
+                <div class="ride-rating-summary">
+                    <span>Passenger rating</span>
+                    <strong>{{ "⭐" * ride["rating"] }}</strong>
+                    {% if ride["review"] %}
+                    <p>“{{ ride["review"] }}”</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </article>
+            {% endfor %}
+        {% else %}
+            <div class="history-empty">
+                <h2>No completed rides yet</h2>
+                <p>Completed trips assigned to you will appear here.</p>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="driver-reviews">
+        <div class="history-heading compact-heading">
+            <span class="history-label">PASSENGER FEEDBACK</span>
+            <h2>Passenger Reviews</h2>
+        </div>
+
+        {% if reviews %}
+        <div class="review-list">
+            {% for review in reviews %}
+            <article class="review-card">
+                <div class="review-card-top">
+                    <strong>#RG{{ review["booking_id"] }}</strong>
+                    <span>{{ review["booking_time"] }}</span>
+                </div>
+                <div class="review-stars">{{ "⭐" * review["rating"] }}</div>
+                <p>“{{ review["review"] }}”</p>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="history-empty review-empty">
+            <p>No reviews yet.</p>
+        </div>
+        {% endif %}
+    </section>
+</main>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

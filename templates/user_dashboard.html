@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Refresh every 3 seconds so ride status updates automatically -->
+    <meta http-equiv="refresh" content="3">
+
+    <title>RideGo | My Ride</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="user-ride-page">
+
+<!-- NAVBAR -->
+
+<nav class="ride-navbar">
+
+    <div class="ride-logo">
+        🚕 <strong>RideGo</strong>
+    </div>
+
+    <div class="ride-nav-links">
+
+        <a href="/">Home</a>
+
+        <a href="/book">Book a Ride</a>
+
+        <a href="/ride-history">Ride History</a>
+
+        <a href="#profile">Profile</a>
+
+        <a href="/logout" class="logout-btn">Logout</a>
+
+    </div>
+
+</nav>
+
+
+<!-- MAIN -->
+
+<main class="user-ride-container">
+
+    <div class="user-ride-heading">
+
+        <span>MY RIDE</span>
+
+        <h1>Your current ride</h1>
+
+        <p>
+            Track your booking status and ride details.
+        </p>
+
+        <a href="/ride-history" class="dashboard-history-link">My Rides <span>→</span></a>
+
+    </div>
+
+
+    {% if booking %}
+
+    <!-- STATUS CARD -->
+
+    <div class="ride-status-card">
+
+        {% if booking["status"] == "Searching" %}
+
+            <div class="status-icon searching">
+                🔍
+            </div>
+
+            <div>
+
+                <span class="status-label">
+                    SEARCHING
+                </span>
+
+                <h2>
+                    Finding a driver
+                </h2>
+
+                <p>
+                    We are looking for an available driver for your ride.
+                </p>
+
+            </div>
+
+
+        {% elif booking["status"] == "Accepted" %}
+
+            <div class="status-icon accepted">
+                🚕
+            </div>
+
+            <div>
+
+                <span class="status-label">
+                    DRIVER ON THE WAY
+                </span>
+
+                <h2>
+                    Your driver is on the way
+                </h2>
+
+                <p>
+                    Your driver has accepted the ride and is coming to pick you up.
+                </p>
+
+            </div>
+
+
+        {% elif booking["status"] == "Ride Started" %}
+
+            <div class="status-icon started">
+                🚗
+            </div>
+
+            <div>
+
+                <span class="status-label">
+                    RIDE IN PROGRESS
+                </span>
+
+                <h2>
+                    Your ride has started
+                </h2>
+
+                <p>
+                    You are currently on your way to your destination.
+                </p>
+
+            </div>
+
+
+        {% elif booking["status"] == "Completed" %}
+
+            <div class="status-icon completed">
+                ✓
+            </div>
+
+            <div>
+
+                <span class="status-label">
+                    RIDE COMPLETED
+                </span>
+
+                <h2>
+                    You reached your destination
+                </h2>
+
+                <p>
+                    Your ride has been completed successfully.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- RIDE DETAILS -->
+
+    <div class="user-ride-grid">
+
+
+        <!-- ROUTE -->
+
+        <div class="user-ride-card">
+
+            <div class="card-title">
+
+                <span>📍</span>
+
+                <div>
+
+                    <h3>Ride details</h3>
+
+                    <p>
+                        Booking #RG{{ booking["id"] }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="route-details">
+
+                <div class="route-point">
+
+                    <div class="route-dot pickup-dot"></div>
+
+                    <div>
+
+                        <small>
+                            PICKUP
+                        </small>
+
+                        <strong>
+                            {{ booking["pickup"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="route-line"></div>
+
+
+                <div class="route-point">
+
+                    <div class="route-dot destination-dot"></div>
+
+                    <div>
+
+                        <small>
+                            DESTINATION
+                        </small>
+
+                        <strong>
+                            {{ booking["destination"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FARE -->
+
+        <div class="user-ride-card fare-card">
+
+            <span class="small-heading">
+                TOTAL FARE
+            </span>
+
+            <h2>
+                ₹{{ booking["fare"] }}
+            </h2>
+
+
+            <div class="fare-info">
+
+                <span>
+                    Cab type
+                </span>
+
+                <strong>
+                    {{ booking["cab_type"] }}
+                </strong>
+
+            </div>
+
+
+            <div class="fare-info">
+
+                <span>
+                    Status
+                </span>
+
+                <strong>
+                    {{ booking["status"] }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- DRIVER -->
+
+    {% if booking["driver_id"] and booking["status"] in
+          ["Accepted", "Ride Started", "Completed"] %}
+
+    <div class="driver-user-card">
+
+        <div class="driver-avatar">
+            👨‍✈️
+        </div>
+
+
+        <div class="driver-user-info">
+
+            <span>
+                YOUR DRIVER
+            </span>
+
+            <h2>
+                {{ booking["driver_name"] }}
+            </h2>
+
+            <p>
+                Your driver has accepted this booking.
+            </p>
+
+        </div>
+
+
+        <div class="driver-status-badge">
+
+            ✓ Driver Assigned
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- PAYMENT -->
+
+    {% if booking["status"] == "Completed" %}
+
+    <div class="pay-now-card">
+
+        <div>
+
+            <span>
+                RIDE COMPLETED
+            </span>
+
+            <h2>
+                Your ride is complete 🎉
+            </h2>
+
+            <p>
+                Complete the payment for your ride.
+            </p>
+
+        </div>
+
+
+        <a href="{{ url_for('payment', booking_id=booking['id']) }}"
+           class="pay-now-button">
+
+            💳 Pay ₹{{ booking["fare"] }}
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+
+    {% else %}
+
+    <!-- NO BOOKING -->
+
+    <div class="no-ride-card">
+
+        <div class="no-ride-icon">
+            🚕
+        </div>
+
+        <h2>
+            No active ride
+        </h2>
+
+        <p>
+            You haven't booked a ride yet.
+        </p>
+
+        <a href="/book" class="book-now-button">
+            Book a Ride
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</main>
+
+
+<footer class="ride-footer">
+
+    <strong>
+        🚕 RideGo
+    </strong>
+
+    <span>
+        Safe rides. Simple journeys.
+    </span>
+
+</footer>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

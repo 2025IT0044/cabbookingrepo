@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RideGo</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">🚕 RideGo</div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <a href="/register" class="login-btn">Register</a>
+        </div>
+    </nav>
+
+
+    <div class="form-container">
+
+        <div class="form-card">
+
+            <h1>Welcome Back</h1>
+
+            <p>Login to continue your RideGo journey.</p>
+
+            {% if error %}
+            <div class="login-error">{{ error }}</div>
+            {% endif %}
+
+
+            <form method="POST">
+
+                <fieldset class="role-selection">
+                    <legend>Login as</legend>
+                    <label>
+                        <input type="radio" name="role" value="user" checked>
+                        <span>User</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="role" value="driver">
+                        <span>Driver</span>
+                    </label>
+                </fieldset>
+
+                <label>Email</label>
+                <input type="email"
+                       name="email"
+                       placeholder="Enter your email"
+                       required>
+
+
+                <label>Password</label>
+                <input type="password"
+                       name="password"
+                       placeholder="Enter your password"
+                       required>
+
+
+                <button type="submit">
+                    Login
+                </button>
+
+            </form>
+
+
+            <p class="form-bottom">
+                Don't have an account?
+                <a href="/register">Create Account</a>
+            </p>
+
+        </div>
+
+    </div>
+
+    <footer class="site-footer">
+        <div>
+            <strong>🚕 RideGo</strong>
+            <p>Simple. Reliable. Ready to ride.</p>
+        </div>
+        <div class="footer-links">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+        </div>
+        <small>© 2026 RideGo. All rights reserved.</small>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

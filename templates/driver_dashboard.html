@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <!-- Refresh so new ride requests appear automatically -->
+    <meta http-equiv="refresh" content="3">
+
+    <title>RideGo | Driver Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body class="driver-page">
+
+
+<!-- NAVBAR -->
+
+<nav class="driver-navbar">
+
+    <div class="driver-logo">
+        🚕 <strong>RideGo</strong>
+    </div>
+
+
+    <div class="driver-nav">
+
+        <a href="/driver/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/driver/rides">
+            My Rides
+        </a>
+
+        <a href="#profile">
+            Profile
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- MAIN -->
+
+<main class="driver-container">
+
+
+    <!-- HEADER -->
+
+    <section class="driver-welcome">
+
+        <div>
+
+            <span class="driver-label">
+                DRIVER DASHBOARD
+            </span>
+
+            <h1>
+                Good evening, {{ driver_profile["name"] }} 👋
+            </h1>
+
+            <p>
+                Manage your rides and earnings from one place.
+            </p>
+
+        </div>
+
+
+        <div class="online-status">
+
+            <span class="online-dot"></span>
+
+            Online
+
+        </div>
+
+    </section>
+
+
+    <!-- STATS -->
+
+    <section class="driver-stats">
+
+
+        <div class="driver-stat-card">
+
+            <span>
+                Today's Rides
+            </span>
+
+            <strong>
+                {{ today_rides }}
+            </strong>
+
+            <small>
+                Completed trips
+            </small>
+
+        </div>
+
+
+        <div class="driver-stat-card">
+
+            <span>
+                Today's Earnings
+            </span>
+
+            <strong>
+                ₹{{ today_earnings }}
+            </strong>
+
+            <small>
+                Keep driving!
+            </small>
+
+        </div>
+
+
+        <div class="driver-stat-card">
+
+            <span>
+                Your Rating
+            </span>
+
+            {% if driver_rating_count %}
+            <strong>
+                ⭐ {{ "%.1f"|format(driver_average_rating) }} / 5
+            </strong>
+
+            <small>
+                Based on {{ driver_rating_count }} rides
+            </small>
+            {% else %}
+            <strong>
+                ⭐ No ratings yet
+            </strong>
+            {% endif %}
+
+        </div>
+
+
+        <div class="driver-stat-card">
+
+            <span>
+                Vehicle
+            </span>
+
+            <strong>
+                {{ driver_profile["cab_type"] or "No cab assigned" }}
+            </strong>
+
+            <small>
+                {{ driver_profile["car_number"] or "Vehicle pending" }}
+            </small>
+
+        </div>
+
+    </section>
+
+
+    <!-- CONTENT -->
+
+    <section class="driver-layout">
+
+
+        <!-- RIDE REQUEST -->
+
+        <div class="ride-request-card">
+
+
+            <div class="request-header">
+
+                <div>
+
+                    <span class="driver-label">
+                        NEW RIDE REQUEST
+                    </span>
+
+                    <h2>
+                        Passenger Ride
+                    </h2>
+
+                </div>
+
+
+                {% if booking and booking["status"] == "Searching" %}
+
+                <span class="request-badge">
+                    NEW
+                </span>
+
+                {% endif %}
+
+            </div>
+
+
+            {% if booking %}
+
+
+            <!-- PASSENGER -->
+
+            <div class="passenger-box">
+
+                <div class="passenger-avatar">
+                    👤
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Passenger #{{ booking["user_id"] }}
+                    </strong>
+
+                    <span>
+                        Booking #RG{{ booking["id"] }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- ROUTE -->
+
+            <div class="driver-route">
+
+
+                <div class="driver-location">
+
+                    <span class="route-dot pickup-dot"></span>
+
+                    <div>
+
+                        <small>
+                            PICKUP
+                        </small>
+
+                        <strong>
+                            {{ booking["pickup"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="route-line"></div>
+
+
+                <div class="driver-location">
+
+                    <span class="route-dot destination-dot"></span>
+
+                    <div>
+
+                        <small>
+                            DESTINATION
+                        </small>
+
+                        <strong>
+                            {{ booking["destination"] }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RIDE INFO -->
+
+            <div class="request-info">
+
+
+                <div>
+
+                    <span>
+                        Cab
+                    </span>
+
+                    <strong>
+                        {{ booking["cab_type"] }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Fare
+                    </span>
+
+                    <strong>
+                        ₹{{ booking["fare"] }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Status
+                    </span>
+
+                    <strong class="driver-status">
+
+                        {% if booking["status"] == "Searching" %}
+
+                            New Request
+
+                        {% elif booking["status"] == "Accepted" %}
+
+                            Accepted
+
+                        {% elif booking["status"] == "Ride Started" %}
+
+                            Ride Started
+
+                        {% elif booking["status"] == "Completed" %}
+
+                            Completed
+
+                        {% else %}
+
+                            {{ booking["status"] }}
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+
+            {% if booking["status"] == "Searching" %}
+
+
+            <div class="driver-actions">
+
+                <a href="/driver/accept/{{ booking['id'] }}"
+                   class="accept-btn">
+
+                    ✓ Accept Ride
+
+                </a>
+
+
+                <a href="/driver/reject/{{ booking['id'] }}"
+                   class="reject-btn">
+
+                    ✕ Reject
+
+                </a>
+
+            </div>
+
+
+            {% elif booking["status"] == "Accepted" %}
+
+
+            <div class="driver-actions">
+
+                <a href="/driver/start/{{ booking['id'] }}"
+                   class="start-btn">
+
+                    🚕 Start Ride
+
+                </a>
+
+            </div>
+
+
+            {% elif booking["status"] == "Ride Started" %}
+
+
+            <div class="driver-actions">
+
+                <a href="/driver/complete/{{ booking['id'] }}"
+                   class="complete-btn">
+
+                    ✓ Complete Ride
+
+                </a>
+
+            </div>
+
+
+            {% elif booking["status"] == "Completed" %}
+
+
+            <div class="completed-message">
+
+                ✓ Ride completed successfully
+
+            </div>
+
+
+            {% endif %}
+
+
+            {% else %}
+
+
+            <!-- NO RIDE -->
+
+            <div class="no-ride">
+
+                <div>
+                    🚕
+                </div>
+
+                <h3>
+                    No active ride requests
+                </h3>
+
+                <p>
+                    Stay online to receive new ride requests.
+                </p>
+
+            </div>
+
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- RIGHT SIDE -->
+
+        <aside class="driver-side">
+
+
+            <!-- PROFILE -->
+
+            <div class="driver-profile-card" id="profile">
+
+                <div class="profile-avatar">
+                    👨🏻
+                </div>
+
+                <h2>
+                    {{ driver_profile["name"] }}
+                </h2>
+
+                <p>
+                    Professional Driver
+                </p>
+
+
+                <div class="profile-rating">
+                    ★ 4.8
+                </div>
+
+
+                <hr>
+
+
+                <div class="profile-detail">
+
+                    <span>
+                        Phone
+                    </span>
+
+                    <strong>
+                        {{ driver_profile["phone"] or "Not provided" }}
+                    </strong>
+
+                </div>
+
+
+                <div class="profile-detail">
+
+                    <span>
+                        License
+                    </span>
+
+                    <strong>
+                        {{ driver_profile["license_no"] or "Not provided" }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- VEHICLE -->
+
+            <div class="vehicle-driver-card">
+
+                <span class="driver-label">
+                    YOUR VEHICLE
+                </span>
+
+
+                <div class="vehicle-driver">
+
+                    <div>
+                        🛺
+                    </div>
+
+
+                    <section>
+
+                        <strong>
+                            {{ driver_profile["cab_type"] or "No cab assigned" }}
+                        </strong>
+
+                        <span>
+                            {{ driver_profile["car_number"] or "Vehicle pending" }}
+                        </span>
+
+                    </section>
+
+                </div>
+
+            </div>
+
+
+            <!-- SAFETY -->
+
+            <div class="driver-safety">
+
+                🛡️
+
+                <div>
+
+                    <strong>
+                        Drive Safe
+                    </strong>
+
+                    <p>
+                        Follow traffic rules and keep passengers safe.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+    </section>
+
+</main>
+
+
+<footer class="driver-footer">
+
+    <strong>
+        🚕 RideGo
+    </strong>
+
+    <span>
+        Driver Partner Portal
+    </span>
+
+</footer>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RideGo - Cab Booking</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+
+        <div class="logo">
+            🚕 RideGo
+        </div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <a href="/login" class="login-btn">Login</a>
+        </div>
+
+    </nav>
+
+
+    <!-- Hero Section -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <p class="small-title">YOUR RIDE, YOUR WAY</p>
+
+            <h1>Move around the city with RideGo.</h1>
+
+            <p class="description">
+                Book reliable rides, choose your cab, track your journey and pay with ease.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/book" class="book-btn">Book a Ride <span>→</span></a>
+                <a href="/about" class="outline-btn">Explore RideGo</a>
+            </div>
+
+        </div>
+
+
+        <!-- Ride visual -->
+        <div class="hero-ride-visual">
+
+            <div class="visual-glow"></div>
+
+            <div class="visual-route route-route-one"></div>
+            <div class="visual-route route-route-two"></div>
+
+            <div class="visual-pin visual-pin-start">●</div>
+            <div class="visual-pin visual-pin-end">●</div>
+
+            <div class="visual-car">
+                <span>🚕</span>
+                <strong>RideGo</strong>
+                <small>On your way</small>
+            </div>
+
+            <div class="visual-distance">Fast pickup <span>•</span> Safe arrival</div>
+
+
+        </div>
+
+    </section>
+
+
+    <section class="features home-features">
+        <div class="section-heading">
+            <p class="small-title">WHY RIDEGO?</p>
+            <h2>Everything you need for a better ride.</h2>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature">
+                <div class="feature-icon">🚕</div>
+                <h3>Easy Booking</h3>
+                <p>Book your ride in just a few simple steps.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🛡️</div>
+                <h3>Reliable &amp; Safe</h3>
+                <p>Designed for a smooth and dependable ride experience.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💳</div>
+                <h3>Flexible Payments</h3>
+                <p>Choose your preferred payment method after your ride.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📋</div>
+                <h3>Ride History</h3>
+                <p>Keep track of your previous rides and trip details.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="home-cta">
+        <div>
+            <p class="small-title">YOUR NEXT JOURNEY</p>
+            <h2>Ready to ride?</h2>
+            <p>Book your next journey with RideGo.</p>
+        </div>
+        <a href="/book" class="book-btn">Book a Ride <span>→</span></a>
+    </section>
+
+
+    <footer class="site-footer">
+        <div>
+            <strong>🚕 RideGo</strong>
+            <p>Simple. Reliable. Ready to ride.</p>
+        </div>
+        <div class="footer-links">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+        </div>
+        <small>© 2026 RideGo. All rights reserved.</small>
+    </footer>
+
+
+</body>
+</html>
